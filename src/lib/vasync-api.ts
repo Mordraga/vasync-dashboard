@@ -3,6 +3,7 @@ import "server-only";
 import { config } from "@/lib/config";
 import type { SessionPayload } from "@/lib/session";
 import type { Override, RecurringRule } from "@/types/availability";
+import type { BotSettings } from "@/types/settings";
 
 /** Server-only client for vasync-database. Every call attaches the
  * caller's already-verified Discord identity as headers, matching that
@@ -55,6 +56,18 @@ export function deleteOverride(session: SessionPayload, overrideDate: string): P
   return request(`/users/${session.discordId}/availability/overrides/${overrideDate}`, session, {
     method: "DELETE",
   });
+}
+
+export function listOverrides(session: SessionPayload): Promise<Override[]> {
+  return request(`/users/${session.discordId}/availability/overrides`, session);
+}
+
+export function getBotSettings(session: SessionPayload): Promise<BotSettings> {
+  return request("/settings", session);
+}
+
+export function updateBotSettings(session: SessionPayload, settings: BotSettings): Promise<BotSettings> {
+  return request("/settings", session, { method: "PUT", body: JSON.stringify(settings) });
 }
 
 export function upsertUser(session: SessionPayload): Promise<void> {

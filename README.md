@@ -19,8 +19,15 @@ for the product spec.
 - `src/app/api/availability/*` - thin proxy routes the browser calls;
   they attach the caller's identity headers server-side and forward to
   `vasync-database`.
-- `src/components` - `AvailabilityGrid` (state + save) composed from the
-  atomic `DayRow` and `StatusSelect`.
+- `src/app/api/admin/settings` - staff-only proxy for the bot-config panel
+  (`vasync-database`'s `/settings`); the backend re-checks the staff role
+  itself, this route just fails fast for non-staff.
+- `src/app/dashboard` - the weekly availability grid + date overrides.
+- `src/app/admin` - staff-only bot settings (reminder lead time, match
+  window days); redirects non-staff back to `/dashboard`.
+- `src/components` - `AvailabilityGrid`/`WeekdayRow`/`StatusBadge` for the
+  weekly grid, `OverridesPanel`/`OverrideModal` for date overrides,
+  `Header`/`AvatarMenu` for the top bar.
 
 ## Running locally
 

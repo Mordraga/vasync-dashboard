@@ -9,6 +9,7 @@ const payload: SessionPayload = {
   roleIds: ["10"],
   role: "entity",
   timezone: "UTC",
+  avatarUrl: null,
 };
 
 beforeAll(() => {

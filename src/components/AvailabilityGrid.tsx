@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { DayRow } from "@/components/DayRow";
+import { WeekdayRow } from "@/components/WeekdayRow";
 import { buildDefaultWeek, mergeWithFetched } from "@/lib/availability-defaults";
 import { RecurringRule } from "@/types/availability";
 
@@ -39,26 +39,18 @@ export function AvailabilityGrid() {
 
   return (
     <div>
-      <table>
-        <thead>
-          <tr>
-            <th>Day</th>
-            <th>Status</th>
-            <th>Window start</th>
-            <th>Window end</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rules.map((rule) => (
-            <DayRow key={rule.weekday} rule={rule} onChange={updateRule} />
-          ))}
-        </tbody>
-      </table>
-      <button onClick={save} disabled={saveState === "saving"}>
-        {saveState === "saving" ? "Saving..." : "Save"}
-      </button>
-      {saveState === "saved" && <span> Saved.</span>}
-      {saveState === "error" && <span> Something went wrong.</span>}
+      <div className="week-grid">
+        {rules.map((rule) => (
+          <WeekdayRow key={rule.weekday} rule={rule} onChange={updateRule} />
+        ))}
+      </div>
+      <div className="btn-row">
+        <button className="btn btn-primary" onClick={save} disabled={saveState === "saving"}>
+          {saveState === "saving" ? "Saving..." : "Save Availability"}
+        </button>
+        {saveState === "saved" && <span className="form-status">Saved.</span>}
+        {saveState === "error" && <span className="form-status error">Something went wrong.</span>}
+      </div>
     </div>
   );
 }

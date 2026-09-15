@@ -12,6 +12,7 @@ export interface SessionPayload {
   roleIds: string[];
   role: Role;
   timezone: string;
+  avatarUrl: string | null;
 }
 
 function sign(value: string): string {

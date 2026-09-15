@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 import { config } from "@/lib/config";
-import { exchangeCodeForToken, fetchDiscordUser, fetchGuildMember } from "@/lib/discord-oauth";
+import { buildAvatarUrl, exchangeCodeForToken, fetchDiscordUser, fetchGuildMember } from "@/lib/discord-oauth";
 import { OAUTH_STATE_COOKIE } from "@/lib/oauth-state";
 import { resolveRole } from "@/lib/role";
 import { createSessionToken, SESSION_COOKIE_NAME } from "@/lib/session";
@@ -38,6 +38,7 @@ export async function GET(request: NextRequest) {
     roleIds: member.roles,
     role,
     timezone: "UTC",
+    avatarUrl: buildAvatarUrl(user),
   };
 
   await upsertUser(session);

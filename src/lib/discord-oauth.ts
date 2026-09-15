@@ -11,6 +11,7 @@ export interface DiscordTokenResponse {
 export interface DiscordUser {
   id: string;
   username: string;
+  avatar: string | null;
 }
 
 export interface DiscordGuildMember {
@@ -67,4 +68,11 @@ export async function fetchGuildMember(accessToken: string, guildId: string): Pr
     throw new Error(`discord guild member lookup failed: ${response.status}`);
   }
   return response.json();
+}
+
+/** Discord's CDN avatar URL, or null if the user has no custom avatar
+ * (the caller falls back to initials in that case). */
+export function buildAvatarUrl(user: DiscordUser): string | null {
+  if (!user.avatar) return null;
+  return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`;
 }

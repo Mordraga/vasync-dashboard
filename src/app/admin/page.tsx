@@ -1,14 +1,16 @@
 import { redirect } from "next/navigation";
 
-import { AvailabilityGrid } from "@/components/AvailabilityGrid";
+import { AdminSettingsPanel } from "@/components/AdminSettingsPanel";
 import { Header } from "@/components/Header";
-import { OverridesPanel } from "@/components/OverridesPanel";
 import { getSession } from "@/lib/current-session";
 
-export default async function DashboardPage() {
+export default async function AdminPage() {
   const session = await getSession();
   if (!session) {
     redirect("/login");
+  }
+  if (session.role !== "staff") {
+    redirect("/dashboard");
   }
 
   return (
@@ -16,11 +18,10 @@ export default async function DashboardPage() {
       <Header session={session} />
       <main className="page-shell">
         <div className="card">
-          <h1>Welcome back, {session.displayName}</h1>
-          <p className="subtitle">Set your normal collab availability.</p>
-          <AvailabilityGrid />
+          <h1>Admin</h1>
+          <p className="subtitle">Server-wide settings for the VAsync bot.</p>
         </div>
-        <OverridesPanel />
+        <AdminSettingsPanel />
       </main>
     </>
   );
