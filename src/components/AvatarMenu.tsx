@@ -45,7 +45,7 @@ export function AvatarMenu({ displayName, avatarUrl, isStaff }: AvatarMenuProps)
 
       {open && (
         <div className="avatar-menu-dropdown">
-          {isStaff && <a href="/admin">Admin settings</a>}
+          {isStaff && <a href="/admin">TVHead Panel</a>}
           <form action="/api/auth/logout" method="post">
             <button type="submit">Sign out</button>
           </form>

@@ -17,11 +17,13 @@ export function resolveRole(roleIds: string[]): Role | null {
 const ROLE_TAGLINES: Record<Role, string> = {
   entity: "ENTITY SCHEDULING",
   researcher: "RESEARCHER SCHEDULING",
-  staff: "M.E.G. SCHEDULING",
+  staff: "TVHEAD SCHEDULING",
 };
 
 /** The header tagline swaps to whichever role the signed-in user actually
- * holds, purely for flavor - it has no bearing on what they can access. */
+ * holds, purely for flavor - it has no bearing on what they can access.
+ * "staff" is the internal/backend role name (matches vasync-database's
+ * Role enum); VAsync's own name for that role is "TVHeads" (moderators). */
 export function roleTagline(role: Role): string {
   return ROLE_TAGLINES[role];
 }

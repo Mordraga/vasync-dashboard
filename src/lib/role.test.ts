@@ -30,6 +30,6 @@ describe("roleTagline", () => {
   it("gives each role its own header flavor text", () => {
     expect(roleTagline("entity")).toBe("ENTITY SCHEDULING");
     expect(roleTagline("researcher")).toBe("RESEARCHER SCHEDULING");
-    expect(roleTagline("staff")).toBe("M.E.G. SCHEDULING");
+    expect(roleTagline("staff")).toBe("TVHEAD SCHEDULING");
   });
 });
