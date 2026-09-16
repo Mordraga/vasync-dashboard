@@ -71,10 +71,14 @@ export function updateBotSettings(session: SessionPayload, settings: BotSettings
 }
 
 export function upsertUser(session: SessionPayload): Promise<void> {
+  // discord_id stays a string here: Discord snowflakes exceed
+  // Number.MAX_SAFE_INTEGER, so Number(session.discordId) would silently
+  // round to the wrong value. Pydantic coerces the numeric string to its
+  // arbitrary-precision int field without any loss.
   return request(`/users/${session.discordId}`, session, {
     method: "PUT",
     body: JSON.stringify({
-      discord_id: Number(session.discordId),
+      discord_id: session.discordId,
       display_name: session.displayName,
       timezone: session.timezone,
       role: session.role,
