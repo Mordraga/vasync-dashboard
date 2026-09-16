@@ -14,8 +14,7 @@ export const STATUS_KEYS: Record<Status, "no" | "maybe" | "yes"> = {
 
 /** "2026-07-27" -> "Jul 27" */
 export function formatShortDate(isoDate: string): string {
-  const [year, month, day] = isoDate.split("-").map(Number);
-  return new Date(Date.UTC(year, month - 1, day)).toLocaleDateString("en-US", {
+  return new Date(`${isoDate}T00:00:00Z`).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     timeZone: "UTC",
