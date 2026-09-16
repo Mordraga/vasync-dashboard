@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { resolveRole } from "@/lib/role";
+import { resolveRole, roleTagline } from "@/lib/role";
 
 beforeAll(() => {
   process.env.ENTITY_ROLE_ID = "10";
@@ -23,5 +23,13 @@ describe("resolveRole", () => {
 
   it("returns null when no recognized role is present", () => {
     expect(resolveRole(["999"])).toBeNull();
+  });
+});
+
+describe("roleTagline", () => {
+  it("gives each role its own header flavor text", () => {
+    expect(roleTagline("entity")).toBe("ENTITY SCHEDULING");
+    expect(roleTagline("researcher")).toBe("RESEARCHER SCHEDULING");
+    expect(roleTagline("staff")).toBe("M.E.G. SCHEDULING");
   });
 });

@@ -13,3 +13,15 @@ export function resolveRole(roleIds: string[]): Role | null {
   if (ids.has(config.entityRoleId())) return "entity";
   return null;
 }
+
+const ROLE_TAGLINES: Record<Role, string> = {
+  entity: "ENTITY SCHEDULING",
+  researcher: "RESEARCHER SCHEDULING",
+  staff: "M.E.G. SCHEDULING",
+};
+
+/** The header tagline swaps to whichever role the signed-in user actually
+ * holds, purely for flavor - it has no bearing on what they can access. */
+export function roleTagline(role: Role): string {
+  return ROLE_TAGLINES[role];
+}
