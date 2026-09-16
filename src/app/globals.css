@@ -1,16 +1,21 @@
+/* VAsync lives in the Backrooms - the palette is dingy fluorescent
+   yellow on damp, waterlogged wallpaper brown, not clean Discord dark
+   mode. Discord's own blurple is kept only where Discord's brand
+   requires it (the sign-in button). */
 :root {
-  --bg: #0b0b10;
-  --surface: #14141b;
-  --surface-raised: #1a1a24;
-  --border: #26262f;
-  --text: #eaeaf0;
-  --text-muted: #8b8b9a;
+  --bg: #0c0a05;
+  --surface: #17140a;
+  --surface-raised: #201b0e;
+  --border: #3d341a;
+  --text: #e8dcae;
+  --text-muted: #8f8560;
+  --glow: #f3e29a;
   --accent: #5865f2;
   --accent-hover: #4752c4;
-  --status-yes: #3ba55c;
-  --status-maybe: #f0b132;
-  --status-no: #6b6b78;
-  --danger: #ed4245;
+  --status-yes: #7a9a3f;
+  --status-maybe: #d1a83c;
+  --status-no: #6b6350;
+  --danger: #b5453a;
   --radius: 10px;
   --font-sans: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
@@ -22,9 +27,35 @@
 html,
 body {
   margin: 0;
-  background: var(--bg);
+  background-color: var(--bg);
+  background-image: repeating-linear-gradient(
+      0deg,
+      rgba(243, 226, 154, 0.025) 0px,
+      rgba(243, 226, 154, 0.025) 1px,
+      transparent 1px,
+      transparent 3px
+    ), radial-gradient(ellipse at 50% -10%, rgba(243, 226, 154, 0.07), transparent 60%);
   color: var(--text);
   font-family: var(--font-sans);
+  position: relative;
+}
+
+/* faint CRT scanlines - a liminal-space room is never lit quite right */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.15) 0px,
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  mix-blend-mode: overlay;
+  opacity: 0.5;
+  z-index: 999;
 }
 
 button,
@@ -36,6 +67,43 @@ select {
 
 a {
   color: var(--accent);
+}
+
+/* the wordmark is a dying fluorescent tube, not a logotype */
+.wordmark {
+  color: var(--glow);
+  text-shadow: 0 0 6px rgba(243, 226, 154, 0.5);
+  animation: flicker 7s infinite;
+}
+
+@keyframes flicker {
+  0%,
+  92%,
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 6px rgba(243, 226, 154, 0.55), 0 0 16px rgba(243, 226, 154, 0.25);
+  }
+  92.5% {
+    opacity: 0.4;
+    text-shadow: none;
+  }
+  93% {
+    opacity: 1;
+  }
+  93.5% {
+    opacity: 0.55;
+    text-shadow: none;
+  }
+  94% {
+    opacity: 1;
+    text-shadow: 0 0 10px rgba(243, 226, 154, 0.7), 0 0 20px rgba(243, 226, 154, 0.3);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wordmark {
+    animation: none;
+  }
 }
 
 .page-shell {
@@ -65,6 +133,7 @@ a {
   font-weight: 800;
   font-size: 1.15rem;
   letter-spacing: 0.06em;
+  width: fit-content;
 }
 
 .app-header .brand .tagline {
@@ -434,7 +503,23 @@ a {
   font-weight: 800;
   font-size: 1.8rem;
   letter-spacing: 0.06em;
-  margin: 0;
+  margin: 0 auto;
+  width: fit-content;
+}
+
+.login-shell .site-tag {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin: 0.35rem 0 0;
+}
+
+.login-shell .footnote {
+  margin-top: 3rem;
+  font-size: 0.7rem;
+  color: var(--border);
+  letter-spacing: 0.05em;
 }
 
 .login-shell p {

@@ -17,7 +17,7 @@ export default async function DashboardPage() {
       <main className="page-shell">
         <div className="card">
           <h1>Welcome back, {session.displayName}</h1>
-          <p className="subtitle">Set your normal collab availability.</p>
+          <p className="subtitle">Log your normal wander schedule - when you're findable, and when you're not.</p>
           <AvailabilityGrid />
         </div>
         <OverridesPanel />

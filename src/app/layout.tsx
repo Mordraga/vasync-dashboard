@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import "@/app/globals.css";
 
 export const metadata = {
-  title: "VAsync Scheduling",
+  title: "VAsync // Site Terminal",
   description: "Register collab availability for the VAsync guild.",
 };
 

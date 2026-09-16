@@ -18,8 +18,8 @@ export default async function AdminPage() {
       <Header session={session} />
       <main className="page-shell">
         <div className="card">
-          <h1>Admin</h1>
-          <p className="subtitle">Server-wide settings for the VAsync bot.</p>
+          <h1>Facility Control</h1>
+          <p className="subtitle">Server-wide settings for the VAsync bot. M.E.G. clearance required.</p>
         </div>
         <AdminSettingsPanel />
       </main>
