@@ -9,7 +9,7 @@ export default async function AdminPage() {
   if (!session) {
     redirect("/login");
   }
-  if (session.role !== "staff") {
+  if (!session.isStaff) {
     redirect("/dashboard");
   }
 

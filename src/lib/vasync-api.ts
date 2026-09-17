@@ -10,6 +10,12 @@ import type { BotSettings } from "@/types/settings";
  * service's app/api/deps.py::get_caller contract. Never imported from a
  * client component - the service token must not reach the browser. */
 
+export class VasyncApiError extends Error {
+  constructor(public readonly status: number, message: string) {
+    super(message);
+  }
+}
+
 function identityHeaders(session: SessionPayload): Record<string, string> {
   return {
     "Content-Type": "application/json",
@@ -26,7 +32,10 @@ async function request<T>(path: string, session: SessionPayload, init: RequestIn
     headers: { ...identityHeaders(session), ...init.headers },
   });
   if (!response.ok) {
-    throw new Error(`vasync-database ${init.method ?? "GET"} ${path} failed: ${response.status}`);
+    throw new VasyncApiError(
+      response.status,
+      `vasync-database ${init.method ?? "GET"} ${path} failed: ${response.status}`
+    );
   }
   return response.status === 204 ? (undefined as T) : response.json();
 }
@@ -70,18 +79,45 @@ export function updateBotSettings(session: SessionPayload, settings: BotSettings
   return request("/settings", session, { method: "PUT", body: JSON.stringify(settings) });
 }
 
-export function upsertUser(session: SessionPayload): Promise<void> {
-  // discord_id stays a string here: Discord snowflakes exceed
-  // Number.MAX_SAFE_INTEGER, so Number(session.discordId) would silently
-  // round to the wrong value. Pydantic coerces the numeric string to its
-  // arbitrary-precision int field without any loss.
-  return request(`/users/${session.discordId}`, session, {
+export interface ResolvedIdentity {
+  role: string;
+  isStaff: boolean;
+}
+
+/** Called during login, before a session exists - the caller's role isn't
+ * known yet (that's what this resolves), so it can't reuse `request()`,
+ * which signs its headers off an already-built SessionPayload. Throws on
+ * a 404, meaning none of the caller's Discord roles are configured in
+ * vasync-database's server_roles table. */
+export async function upsertUser(params: {
+  discordId: string;
+  displayName: string;
+  timezone: string;
+  roleIds: string[];
+}): Promise<ResolvedIdentity> {
+  const response = await fetch(`${config.vasyncApiBaseUrl()}/users/${params.discordId}`, {
     method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Service-Token": config.vasyncServiceToken(),
+    },
+    // discord_id/role_ids stay strings here: Discord snowflakes exceed
+    // Number.MAX_SAFE_INTEGER, so Number(...) would silently round to the
+    // wrong value. Pydantic coerces the numeric strings to its
+    // arbitrary-precision int fields without any loss.
     body: JSON.stringify({
-      discord_id: session.discordId,
-      display_name: session.displayName,
-      timezone: session.timezone,
-      role: session.role,
+      discord_id: params.discordId,
+      display_name: params.displayName,
+      timezone: params.timezone,
+      role_ids: params.roleIds,
     }),
   });
+  if (!response.ok) {
+    throw new VasyncApiError(
+      response.status,
+      `vasync-database PUT /users/${params.discordId} failed: ${response.status}`
+    );
+  }
+  const data = await response.json();
+  return { role: data.role, isStaff: data.is_staff };
 }

@@ -16,7 +16,7 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   const session = await getSession();
-  if (!session || session.role !== "staff") {
+  if (!session || !session.isStaff) {
     return NextResponse.json({ error: "staff role required" }, { status: 403 });
   }
 

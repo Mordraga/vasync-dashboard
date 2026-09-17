@@ -4,9 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { config } from "@/lib/config";
 import { buildAvatarUrl, exchangeCodeForToken, fetchDiscordUser, fetchGuildMember } from "@/lib/discord-oauth";
 import { OAUTH_STATE_COOKIE } from "@/lib/oauth-state";
-import { resolveRole } from "@/lib/role";
 import { createSessionToken, SESSION_COOKIE_NAME } from "@/lib/session";
-import { upsertUser } from "@/lib/vasync-api";
+import { upsertUser, VasyncApiError } from "@/lib/vasync-api";
 
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get("code");
@@ -32,9 +31,23 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL("/login?error=discord", request.url));
   }
 
-  const role = resolveRole(member.roles);
-  if (!role) {
-    return NextResponse.redirect(new URL("/login?error=no_role", request.url));
+  // Which Discord role IDs count as which VAsync role - and who's staff -
+  // is resolved server-side by vasync-database (server_roles table), not
+  // computed here, so a new role only needs a POST /roles there.
+  let identity;
+  try {
+    identity = await upsertUser({
+      discordId: user.id,
+      displayName: member.nick ?? user.username,
+      timezone: "UTC",
+      roleIds: member.roles,
+    });
+  } catch (error) {
+    if (error instanceof VasyncApiError && error.status === 404) {
+      return NextResponse.redirect(new URL("/login?error=no_role", request.url));
+    }
+    console.error("vasync-api upsertUser failed", error);
+    return NextResponse.redirect(new URL("/login?error=upstream", request.url));
   }
 
   const session = {
@@ -42,17 +55,11 @@ export async function GET(request: NextRequest) {
     displayName: member.nick ?? user.username,
     guildId: config.vasyncGuildId(),
     roleIds: member.roles,
-    role,
+    role: identity.role,
+    isStaff: identity.isStaff,
     timezone: "UTC",
     avatarUrl: buildAvatarUrl(user),
   };
-
-  try {
-    await upsertUser(session);
-  } catch (error) {
-    console.error("vasync-api upsertUser failed", error);
-    return NextResponse.redirect(new URL("/login?error=upstream", request.url));
-  }
 
   cookieStore.set(SESSION_COOKIE_NAME, createSessionToken(session), {
     httpOnly: true,

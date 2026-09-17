@@ -12,7 +12,7 @@ export function Header({ session }: { session: SessionPayload }) {
       <AvatarMenu
         displayName={session.displayName}
         avatarUrl={session.avatarUrl}
-        isStaff={session.role === "staff"}
+        isStaff={session.isStaff}
       />
     </header>
   );

@@ -8,8 +8,9 @@ for the product spec.
 
 - `src/lib/discord-oauth.ts` - atomic Discord OAuth2 calls (authorize URL,
   token exchange, user/member lookups).
-- `src/lib/role.ts` - Discord role IDs -> VAsync `Role`, mirroring
-  `vasync-database`'s `app/core/security.py`.
+- `src/lib/role.ts` - display tagline for a resolved role name. Role
+  resolution itself (Discord role ID -> VAsync role) happens server-side
+  in `vasync-database` (`server_roles` table) during login, not here.
 - `src/lib/session.ts` - signs/verifies the session cookie (HMAC, no
   external session store needed for MVP).
 - `src/lib/vasync-api.ts` - server-only client for `vasync-database`;
@@ -32,7 +33,7 @@ for the product spec.
 ## Running locally
 
 ```bash
-cp .env.example .env.local   # Discord OAuth app creds, guild/role IDs, SESSION_SECRET, VASYNC_*
+cp .env.example .env.local   # Discord OAuth app creds, guild ID, SESSION_SECRET, VASYNC_*
 npm install
 npm run dev
 ```
@@ -46,7 +47,7 @@ application with the redirect URI set to `DISCORD_REDIRECT_URI`.
 npm test
 ```
 
-Covers the pure logic: role resolution, session token sign/verify
+Covers the pure logic: role tagline text, session token sign/verify
 (including tamper rejection), and default/merge behavior for the weekly
 availability grid. No Discord app or running API is required. The OAuth
 and proxy API routes aren't covered yet - that needs Next.js route

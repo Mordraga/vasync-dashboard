@@ -1,7 +1,6 @@
 import { createHmac, timingSafeEqual } from "crypto";
 
 import { config } from "@/lib/config";
-import type { Role } from "@/lib/role";
 
 export const SESSION_COOKIE_NAME = "vasync_session";
 
@@ -10,7 +9,8 @@ export interface SessionPayload {
   displayName: string;
   guildId: string;
   roleIds: string[];
-  role: Role;
+  role: string;
+  isStaff: boolean;
   timezone: string;
   avatarUrl: string | null;
 }

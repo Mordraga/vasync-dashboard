@@ -8,6 +8,7 @@ const payload: SessionPayload = {
   guildId: "1",
   roleIds: ["10"],
   role: "entity",
+  isStaff: false,
   timezone: "UTC",
   avatarUrl: null,
 };
