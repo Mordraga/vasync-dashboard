@@ -20,11 +20,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL("/login?error=state", request.url));
   }
 
-  const { access_token } = await exchangeCodeForToken(code);
-  const [user, member] = await Promise.all([
-    fetchDiscordUser(access_token),
-    fetchGuildMember(access_token, config.vasyncGuildId()),
-  ]);
+  let user, member;
+  try {
+    const { access_token } = await exchangeCodeForToken(code);
+    [user, member] = await Promise.all([
+      fetchDiscordUser(access_token),
+      fetchGuildMember(access_token, config.vasyncGuildId()),
+    ]);
+  } catch (error) {
+    console.error("discord auth failed", error);
+    return NextResponse.redirect(new URL("/login?error=discord", request.url));
+  }
 
   const role = resolveRole(member.roles);
   if (!role) {
@@ -41,7 +47,12 @@ export async function GET(request: NextRequest) {
     avatarUrl: buildAvatarUrl(user),
   };
 
-  await upsertUser(session);
+  try {
+    await upsertUser(session);
+  } catch (error) {
+    console.error("vasync-api upsertUser failed", error);
+    return NextResponse.redirect(new URL("/login?error=upstream", request.url));
+  }
 
   cookieStore.set(SESSION_COOKIE_NAME, createSessionToken(session), {
     httpOnly: true,

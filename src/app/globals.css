@@ -515,6 +515,12 @@ a {
   margin: 0.35rem 0 0;
 }
 
+.login-shell .login-error {
+  color: var(--danger);
+  font-size: 0.8rem;
+  margin: -1rem 0 1.25rem;
+}
+
 .login-shell .footnote {
   margin-top: 3rem;
   font-size: 0.7rem;
