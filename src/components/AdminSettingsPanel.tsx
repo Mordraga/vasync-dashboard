@@ -6,7 +6,11 @@ import { BotSettings } from "@/types/settings";
 
 type SaveState = "idle" | "saving" | "saved" | "error";
 
-const DEFAULT_SETTINGS: BotSettings = { reminder_lead_minutes: 15, match_window_days: 14 };
+const DEFAULT_SETTINGS: BotSettings = {
+  reminder_lead_minutes: 15,
+  match_window_days: 14,
+  live_poll_interval_minutes: 5,
+};
 
 export function AdminSettingsPanel() {
   const [settings, setSettings] = useState<BotSettings>(DEFAULT_SETTINGS);
@@ -60,6 +64,20 @@ export function AdminSettingsPanel() {
           max={90}
           value={settings.match_window_days}
           onChange={(event) => setSettings({ ...settings, match_window_days: Number(event.target.value) })}
+        />
+      </div>
+
+      <div className="field">
+        <label htmlFor="live-poll-interval">Live-status poll interval (minutes)</label>
+        <input
+          id="live-poll-interval"
+          type="number"
+          min={1}
+          max={60}
+          value={settings.live_poll_interval_minutes}
+          onChange={(event) =>
+            setSettings({ ...settings, live_poll_interval_minutes: Number(event.target.value) })
+          }
         />
       </div>
 

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { AvailabilityGrid } from "@/components/AvailabilityGrid";
 import { Header } from "@/components/Header";
 import { OverridesPanel } from "@/components/OverridesPanel";
+import { TwitchLinkPanel } from "@/components/TwitchLinkPanel";
 import { getSession } from "@/lib/current-session";
 
 export default async function DashboardPage() {
@@ -21,6 +22,7 @@ export default async function DashboardPage() {
           <AvailabilityGrid />
         </div>
         <OverridesPanel />
+        {session.role === "entity" && <TwitchLinkPanel />}
       </main>
     </>
   );

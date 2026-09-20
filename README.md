@@ -20,15 +20,22 @@ for the product spec.
 - `src/app/api/availability/*` - thin proxy routes the browser calls;
   they attach the caller's identity headers server-side and forward to
   `vasync-database`.
+- `src/app/api/twitch` - thin proxy for registering/reading the caller's
+  Twitch username (`vasync-database`'s `/users/{id}/twitch`), same pattern
+  as the availability routes.
 - `src/app/api/admin/settings` - staff-only proxy for the bot-config panel
   (`vasync-database`'s `/settings`); the backend re-checks the staff role
   itself, this route just fails fast for non-staff.
-- `src/app/dashboard` - the weekly availability grid + date overrides.
+- `src/app/dashboard` - the weekly availability grid, date overrides, and
+  (entities only) the Twitch link form that feeds vasync-bot's `/live`
+  tracker.
 - `src/app/admin` - staff-only bot settings (reminder lead time, match
-  window days); redirects non-staff back to `/dashboard`.
+  window days, live-status poll interval); redirects non-staff back to
+  `/dashboard`.
 - `src/components` - `AvailabilityGrid`/`WeekdayRow`/`StatusBadge` for the
   weekly grid, `OverridesPanel`/`OverrideModal` for date overrides,
-  `Header`/`AvatarMenu` for the top bar.
+  `TwitchLinkPanel` for the Twitch username form, `Header`/`AvatarMenu`
+  for the top bar.
 
 ## Running locally
 

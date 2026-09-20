@@ -4,6 +4,7 @@ import { config } from "@/lib/config";
 import type { SessionPayload } from "@/lib/session";
 import type { Override, RecurringRule } from "@/types/availability";
 import type { BotSettings } from "@/types/settings";
+import type { UserProfile } from "@/types/user";
 
 /** Server-only client for vasync-database. Every call attaches the
  * caller's already-verified Discord identity as headers, matching that
@@ -77,6 +78,17 @@ export function getBotSettings(session: SessionPayload): Promise<BotSettings> {
 
 export function updateBotSettings(session: SessionPayload, settings: BotSettings): Promise<BotSettings> {
   return request("/settings", session, { method: "PUT", body: JSON.stringify(settings) });
+}
+
+export function getUserProfile(session: SessionPayload): Promise<UserProfile> {
+  return request(`/users/${session.discordId}`, session);
+}
+
+export function updateTwitchLink(session: SessionPayload, twitchUsername: string | null): Promise<UserProfile> {
+  return request(`/users/${session.discordId}/twitch`, session, {
+    method: "PUT",
+    body: JSON.stringify({ twitch_username: twitchUsername }),
+  });
 }
 
 export interface ResolvedIdentity {
