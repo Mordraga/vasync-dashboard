@@ -30,8 +30,8 @@ for the product spec.
   (entities only) the Twitch link form that feeds vasync-bot's `/live`
   tracker.
 - `src/app/admin` - staff-only bot settings (reminder lead time, match
-  window days, live-status poll interval); redirects non-staff back to
-  `/dashboard`.
+  window days, live-status poll interval, live-announce channel ID);
+  redirects non-staff back to `/dashboard`.
 - `src/components` - `AvailabilityGrid`/`WeekdayRow`/`StatusBadge` for the
   weekly grid, `OverridesPanel`/`OverrideModal` for date overrides,
   `TwitchLinkPanel` for the Twitch username form, `Header`/`AvatarMenu`

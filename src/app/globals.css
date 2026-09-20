@@ -478,6 +478,11 @@ a {
   font-size: 0.9rem;
 }
 
+.field-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
 .modal-actions {
   display: flex;
   justify-content: space-between;

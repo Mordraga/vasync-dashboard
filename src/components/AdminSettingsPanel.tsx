@@ -10,7 +10,10 @@ const DEFAULT_SETTINGS: BotSettings = {
   reminder_lead_minutes: 15,
   match_window_days: 14,
   live_poll_interval_minutes: 5,
+  live_announce_channel_id: null,
 };
+
+const CHANNEL_ID_PATTERN = /^[0-9]{15,25}$/;
 
 export function AdminSettingsPanel() {
   const [settings, setSettings] = useState<BotSettings>(DEFAULT_SETTINGS);
@@ -23,7 +26,12 @@ export function AdminSettingsPanel() {
       .catch(() => setSaveState("error"));
   }, []);
 
+  const channelId = settings.live_announce_channel_id ?? "";
+  const isChannelIdValid = channelId === "" || CHANNEL_ID_PATTERN.test(channelId);
+
   async function save() {
+    if (!isChannelIdValid) return;
+
     setSaveState("saving");
     try {
       const response = await fetch("/api/admin/settings", {
@@ -81,8 +89,23 @@ export function AdminSettingsPanel() {
         />
       </div>
 
+      <div className="field">
+        <label htmlFor="live-announce-channel">Live announcement channel ID</label>
+        <input
+          id="live-announce-channel"
+          type="text"
+          placeholder="e.g. 1533244315474591795"
+          value={channelId}
+          onChange={(event) =>
+            setSettings({ ...settings, live_announce_channel_id: event.target.value || null })
+          }
+        />
+        {!isChannelIdValid && <span className="form-status error">Must be a Discord channel ID (numbers only).</span>}
+        <span className="field-hint">Leave blank to disable go-live announcements.</span>
+      </div>
+
       <div className="btn-row align-start">
-        <button className="btn btn-primary" onClick={save} disabled={saveState === "saving"}>
+        <button className="btn btn-primary" onClick={save} disabled={saveState === "saving" || !isChannelIdValid}>
           {saveState === "saving" ? "Saving..." : "Save Settings"}
         </button>
         {saveState === "saved" && <span className="form-status">Saved.</span>}
