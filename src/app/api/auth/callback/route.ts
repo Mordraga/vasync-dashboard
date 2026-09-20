@@ -2,10 +2,16 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 import { config } from "@/lib/config";
-import { buildAvatarUrl, exchangeCodeForToken, fetchDiscordUser, fetchGuildMember } from "@/lib/discord-oauth";
+import {
+  buildAvatarUrl,
+  exchangeCodeForToken,
+  fetchDiscordUser,
+  fetchGuildMember,
+  fetchUserConnections,
+} from "@/lib/discord-oauth";
 import { OAUTH_STATE_COOKIE } from "@/lib/oauth-state";
 import { createSessionToken, SESSION_COOKIE_NAME } from "@/lib/session";
-import { upsertUser, VasyncApiError } from "@/lib/vasync-api";
+import { updateTwitchLink, upsertUser, VasyncApiError } from "@/lib/vasync-api";
 
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get("code");
@@ -19,13 +25,22 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL("/login?error=state", request.url));
   }
 
-  let user, member;
+  let user, member, twitchUsername: string | null;
   try {
     const { access_token } = await exchangeCodeForToken(code);
-    [user, member] = await Promise.all([
+    const [fetchedUser, fetchedMember, connections] = await Promise.all([
       fetchDiscordUser(access_token),
       fetchGuildMember(access_token, config.vasyncGuildId()),
+      // Best-effort: a user can hide/revoke connections, or Discord can
+      // hiccup here, and neither should ever block login over it.
+      fetchUserConnections(access_token).catch((error) => {
+        console.error("discord connections lookup failed", error);
+        return [];
+      }),
     ]);
+    user = fetchedUser;
+    member = fetchedMember;
+    twitchUsername = connections.find((connection) => connection.type === "twitch")?.name ?? null;
   } catch (error) {
     console.error("discord auth failed", error);
     return NextResponse.redirect(new URL("/login?error=discord", request.url));
@@ -60,6 +75,18 @@ export async function GET(request: NextRequest) {
     timezone: "UTC",
     avatarUrl: buildAvatarUrl(user),
   };
+
+  // Discord's connected Twitch account is the source of truth when
+  // present - re-synced on every login. Someone with no Twitch connected
+  // there still has the dashboard's manual field as a fallback, and this
+  // never overwrites that with nothing just because they didn't connect.
+  if (twitchUsername) {
+    try {
+      await updateTwitchLink(session, twitchUsername);
+    } catch (error) {
+      console.error("failed to sync twitch connection", error);
+    }
+  }
 
   cookieStore.set(SESSION_COOKIE_NAME, createSessionToken(session), {
     httpOnly: true,

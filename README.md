@@ -7,7 +7,10 @@ for the product spec.
 ## Layout
 
 - `src/lib/discord-oauth.ts` - atomic Discord OAuth2 calls (authorize URL,
-  token exchange, user/member lookups).
+  token exchange, user/member/connections lookups). Requests the
+  `connections` scope so login can auto-sync a connected Twitch account
+  (Discord Settings -> Connections) into `twitch_username` - best-effort,
+  never blocks login if it fails or the user has nothing connected.
 - `src/lib/role.ts` - display tagline for a resolved role name. Role
   resolution itself (Discord role ID -> VAsync role) happens server-side
   in `vasync-database` (`server_roles` table) during login, not here.

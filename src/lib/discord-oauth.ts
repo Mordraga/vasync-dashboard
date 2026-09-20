@@ -1,7 +1,7 @@
 import { config } from "@/lib/config";
 
 const DISCORD_API = "https://discord.com/api/v10";
-const OAUTH_SCOPES = "identify guilds.members.read";
+const OAUTH_SCOPES = "identify guilds.members.read connections";
 
 export interface DiscordTokenResponse {
   access_token: string;
@@ -18,6 +18,11 @@ export interface DiscordGuildMember {
   roles: string[];
   nick: string | null;
   user: DiscordUser;
+}
+
+export interface DiscordConnection {
+  type: string;
+  name: string;
 }
 
 export function buildAuthorizeUrl(state: string): string {
@@ -66,6 +71,19 @@ export async function fetchGuildMember(accessToken: string, guildId: string): Pr
   });
   if (!response.ok) {
     throw new Error(`discord guild member lookup failed: ${response.status}`);
+  }
+  return response.json();
+}
+
+/** Requires the `connections` scope. Best-effort by design at the call
+ * site (callback route) - a user can revoke/hide connections, and this
+ * should never block login over it. */
+export async function fetchUserConnections(accessToken: string): Promise<DiscordConnection[]> {
+  const response = await fetch(`${DISCORD_API}/users/@me/connections`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!response.ok) {
+    throw new Error(`discord connections lookup failed: ${response.status}`);
   }
   return response.json();
 }

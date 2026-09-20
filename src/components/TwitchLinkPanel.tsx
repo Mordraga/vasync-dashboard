@@ -51,8 +51,9 @@ export function TwitchLinkPanel() {
     <div className="card">
       <p className="section-heading">TWITCH LINK</p>
       <p className="subtitle">
-        Register your Twitch username (or paste your channel URL) so /live can show when
-        you&apos;re streaming.
+        If you&apos;ve connected Twitch under Discord Settings &rarr; Connections, this fills in
+        automatically each time you sign in. Otherwise, register your Twitch username (or paste
+        your channel URL) here so /live can show when you&apos;re streaming.
       </p>
 
       <div className="field">
