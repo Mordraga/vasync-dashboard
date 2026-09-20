@@ -22,7 +22,7 @@ export default async function DashboardPage() {
           <AvailabilityGrid />
         </div>
         <OverridesPanel />
-        {session.role === "entity" && <TwitchLinkPanel />}
+        {(session.role === "entity" || session.isStaff) && <TwitchLinkPanel />}
       </main>
     </>
   );

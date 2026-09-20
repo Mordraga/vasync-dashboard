@@ -27,8 +27,8 @@ for the product spec.
   (`vasync-database`'s `/settings`); the backend re-checks the staff role
   itself, this route just fails fast for non-staff.
 - `src/app/dashboard` - the weekly availability grid, date overrides, and
-  (entities only) the Twitch link form that feeds vasync-bot's `/live`
-  tracker.
+  (entities + staff only) the Twitch link form that feeds vasync-bot's
+  `/live` tracker.
 - `src/app/admin` - staff-only bot settings (reminder lead time, match
   window days, live-status poll interval, live-announce channel ID);
   redirects non-staff back to `/dashboard`.
