@@ -28,16 +28,39 @@ export async function GET(request: NextRequest) {
   let user, member, twitchUsername: string | null;
   try {
     const { access_token } = await exchangeCodeForToken(code);
-    const [fetchedUser, fetchedMember, connections] = await Promise.all([
-      fetchDiscordUser(access_token),
-      fetchGuildMember(access_token, config.vasyncGuildId()),
-      // Best-effort: a user can hide/revoke connections, or Discord can
-      // hiccup here, and neither should ever block login over it.
-      fetchUserConnections(access_token).catch((error) => {
-        console.error("discord connections lookup failed", error);
-        return [];
-      }),
-    ]);
+
+    // Keep these sequential while diagnosing guild-member 404s so the
+    // authenticated Discord identity is visible before the member lookup.
+    // Never log the OAuth access token.
+    const fetchedUser = await fetchDiscordUser(access_token);
+    const guildId = config.vasyncGuildId();
+
+    console.info("discord oauth identity resolved", {
+      discordUserId: fetchedUser.id,
+      discordUsername: fetchedUser.username,
+      guildId,
+    });
+
+    let fetchedMember;
+    try {
+      fetchedMember = await fetchGuildMember(access_token, guildId);
+    } catch (error) {
+      console.error("discord guild member lookup failed for oauth identity", {
+        discordUserId: fetchedUser.id,
+        discordUsername: fetchedUser.username,
+        guildId,
+        error,
+      });
+      throw error;
+    }
+
+    // Best-effort: a user can hide/revoke connections, or Discord can
+    // hiccup here, and neither should ever block login over it.
+    const connections = await fetchUserConnections(access_token).catch((error) => {
+      console.error("discord connections lookup failed", error);
+      return [];
+    });
+
     user = fetchedUser;
     member = fetchedMember;
     twitchUsername = connections.find((connection) => connection.type === "twitch")?.name ?? null;
